@@ -68,13 +68,15 @@ public abstract class Ghost extends Unit {
         return sprites.get(getDirection());
     }
 
+    private static final Random RANDOM = new Random();
+
     /**
      * The time that should be taken between moves.
      *
      * @return The suggested delay between moves in milliseconds.
      */
     public long getInterval() {
-        return this.moveInterval + new Random().nextInt(this.intervalVariation);
+        return this.moveInterval + RANDOM.nextInt(this.intervalVariation);
     }
 
 

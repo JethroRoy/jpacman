@@ -103,6 +103,8 @@ public class Pinky extends Ghost {
         return Optional.empty();
     }
 
+    private static final Random RANDOM = new Random();
+
     /**
      * Determines a possible move in a random direction.
      *
@@ -121,7 +123,7 @@ public class Pinky extends Ghost {
         if (directions.isEmpty()) {
             return null;
         }
-        int i = new Random().nextInt(directions.size());
+        int i = RANDOM.nextInt(directions.size());
         return directions.get(i);
     }
 }

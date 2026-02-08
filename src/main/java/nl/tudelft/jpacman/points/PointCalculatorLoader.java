@@ -20,11 +20,12 @@ public class PointCalculatorLoader {
      */
     public PointCalculator load() {
         try {
-            if (clazz == null) {
-                clazz = loadClassFromFile();
+            Class<?> localClazz = clazz;
+            if (localClazz == null) {
+                localClazz = loadClassFromFile();
             }
 
-            return (PointCalculator) clazz.newInstance();
+            return (PointCalculator) localClazz.newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Could not dynamically load the points calculator.", e);
         }

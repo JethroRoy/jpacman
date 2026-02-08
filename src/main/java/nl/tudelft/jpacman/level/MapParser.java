@@ -70,18 +70,20 @@ public class MapParser {
         List<Ghost> ghosts = new ArrayList<>();
         List<Square> startPositions = new ArrayList<>();
 
-        makeGrid(map, width, height, grid, ghosts, startPositions);
+        GridContext gridCtx = new GridContext(map, grid, ghosts, startPositions);
+        makeGrid(gridCtx);
 
         Board board = boardCreator.createBoard(grid);
         return levelCreator.createLevel(board, ghosts, startPositions);
     }
 
-    private void makeGrid(char[][] map, int width, int height,
-                          Square[][] grid, List<Ghost> ghosts, List<Square> startPositions) {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                char c = map[x][y];
-                addSquare(grid, ghosts, startPositions, x, y, c);
+    /**
+     * @param gridCtx
+     */
+    private void makeGrid(GridContext gridCtx) {
+        for (int x = 0; x < gridCtx.map.length; x++) {
+            for (int y = 0; y < gridCtx.map[x].length; y++) {
+                addSquare(gridCtx, x, y);
             }
         }
     }
@@ -91,47 +93,46 @@ public class MapParser {
      * character come from the map files and describe the type
      * of square.
      *
-     * @param grid
-     *            The grid of squares with board[x][y] being the
-     *            square at column x, row y.
-     * @param ghosts
-     *            List of all ghosts that were added to the map.
-     * @param startPositions
-     *            List of all start positions that were added
-     *            to the map.
      * @param x
      *            x coordinate of the square.
      * @param y
      *            y coordinate of the square.
-     * @param c
+     * @param gridCtx
      *            Character describing the square type.
      */
-    protected void addSquare(Square[][] grid, List<Ghost> ghosts,
-                             List<Square> startPositions, int x, int y, char c) {
+    protected void addSquare(GridContext gridCtx, int x, int y) {
+        char c = gridCtx.map[x][y];
+
         switch (c) {
             case ' ':
-                grid[x][y] = boardCreator.createGround();
+                gridCtx.grid[x][y] = boardCreator.createGround();
                 break;
+
             case '#':
-                grid[x][y] = boardCreator.createWall();
+                gridCtx.grid[x][y] = boardCreator.createWall();
                 break;
+
             case '.':
                 Square pelletSquare = boardCreator.createGround();
-                grid[x][y] = pelletSquare;
+                gridCtx.grid[x][y] = pelletSquare;
                 levelCreator.createPellet().occupy(pelletSquare);
                 break;
+
             case 'G':
-                Square ghostSquare = makeGhostSquare(ghosts, levelCreator.createGhost());
-                grid[x][y] = ghostSquare;
+                Square ghostSquare =
+                    makeGhostSquare(gridCtx.ghosts, levelCreator.createGhost());
+                gridCtx.grid[x][y] = ghostSquare;
                 break;
+
             case 'P':
                 Square playerSquare = boardCreator.createGround();
-                grid[x][y] = playerSquare;
-                startPositions.add(playerSquare);
+                gridCtx.grid[x][y] = playerSquare;
+                gridCtx.startPositions.add(playerSquare);
                 break;
+
             default:
-                throw new PacmanConfigurationException("Invalid character at "
-                    + x + "," + y + ": " + c);
+                throw new PacmanConfigurationException(
+                    "Invalid character at " + x + "," + y + ": " + c);
         }
     }
 
@@ -257,5 +258,28 @@ public class MapParser {
      */
     protected BoardFactory getBoardCreator() {
         return boardCreator;
+    }
+
+    /**
+     * @param grid
+     * @param ghosts
+     * @param startPositions
+     * @param map
+     */
+    public static class GridContext {
+        public final Square[][] grid;
+        public final List<Ghost> ghosts;
+        public final List<Square> startPositions;
+        public final char[][] map;
+
+        GridContext(char[][] map,
+                    Square[][] grid,
+                    List<Ghost> ghosts,
+                    List<Square> startPositions) {
+            this.map = map;
+            this.grid = grid;
+            this.ghosts = ghosts;
+            this.startPositions = startPositions;
+        }
     }
 }

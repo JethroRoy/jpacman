@@ -34,14 +34,15 @@ public final class GhostMapParser extends MapParser {
     //This method only supports clyde for now
     //You should add extra cases for ghosts you need.
     @Override
-    protected void addSquare(Square[][] grid, List<Ghost> ghosts,
-                             List<Square> startPositions, int x, int y, char c) {
+    protected void addSquare(MapParser.GridContext gridCtx, int x, int y) {
+        char c = gridCtx.map[x][y];
+
         switch (c) {
             case 'C':
-                grid[x][y] = makeGhostSquare(ghosts, ghostFactory.createClyde());
+                gridCtx.grid[x][y] = makeGhostSquare(gridCtx.ghosts, ghostFactory.createClyde());
                 break;
             default:
-                super.addSquare(grid, ghosts, startPositions, x, y, c);
+                super.addSquare(gridCtx, x, y);
         }
     }
 }

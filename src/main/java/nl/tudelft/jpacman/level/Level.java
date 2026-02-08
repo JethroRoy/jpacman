@@ -194,19 +194,29 @@ public class Level {
         }
     }
 
+    private void setInProgress(boolean start) {
+        synchronized (startStopLock) {
+            if (inProgress == start) {
+                return;
+            }
+
+            if (start) {
+                startNPCs();
+            } else {
+                stopNPCs();
+            }
+
+            inProgress = start;
+            updateObservers();
+        }
+    }
+
     /**
      * Starts or resumes this level, allowing movement and (re)starting the
      * NPCs.
      */
     public void start() {
-        synchronized (startStopLock) {
-            if (isInProgress()) {
-                return;
-            }
-            startNPCs();
-            inProgress = true;
-            updateObservers();
-        }
+        setInProgress(true);
     }
 
     /**
@@ -214,13 +224,7 @@ public class Level {
      * and stopping all NPCs.
      */
     public void stop() {
-        synchronized (startStopLock) {
-            if (!isInProgress()) {
-                return;
-            }
-            stopNPCs();
-            inProgress = false;
-        }
+        setInProgress(false);
     }
 
     /**
@@ -263,13 +267,17 @@ public class Level {
      * Updates the observers about the state of this level.
      */
     private void updateObservers() {
-        if (!isAnyPlayerAlive()) {
-            for (LevelObserver observer : observers) {
-                observer.levelLost();
-            }
+        boolean lost = !isAnyPlayerAlive();
+        boolean won = remainingPellets() == 0;
+
+        if (!lost && !won) {
+            return;
         }
-        if (remainingPellets() == 0) {
-            for (LevelObserver observer : observers) {
+
+        for (LevelObserver observer : observers) {
+            if (lost) {
+                observer.levelLost();
+            } else {
                 observer.levelWon();
             }
         }
@@ -299,17 +307,28 @@ public class Level {
     public int remainingPellets() {
         Board board = getBoard();
         int pellets = 0;
+
         for (int x = 0; x < board.getWidth(); x++) {
             for (int y = 0; y < board.getHeight(); y++) {
-                for (Unit unit : board.squareAt(x, y).getOccupants()) {
-                    if (unit instanceof Pellet) {
-                        pellets++;
-                    }
-                }
+                pellets += countPelletsAt(board, x, y);
             }
         }
-        assert pellets >= 0;
+
         return pellets;
+    }
+
+    private boolean isPellet(Unit unit) {
+        return unit instanceof Pellet;
+    }
+
+    private int countPelletsAt(Board board, int x, int y) {
+        int count = 0;
+        for (Unit unit : board.squareAt(x, y).getOccupants()) {
+            if (isPellet(unit)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

@@ -2,6 +2,7 @@ package nl.tudelft.jpacman.ui;
 
 import java.awt.GridLayout;
 import java.util.LinkedHashMap;
+import javax.swing.SwingConstants;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +54,11 @@ public class ScorePanel extends JPanel {
         setLayout(new GridLayout(2, players.size()));
 
         for (int i = 1; i <= players.size(); i++) {
-            add(new JLabel("Player " + i, JLabel.CENTER));
+            add(new JLabel("Player " + i, SwingConstants.CENTER));
         }
         scoreLabels = new LinkedHashMap<>();
         for (Player player : players) {
-            JLabel scoreLabel = new JLabel("0", JLabel.CENTER);
+            JLabel scoreLabel = new JLabel("0", SwingConstants.CENTER);
             scoreLabels.put(player, scoreLabel);
             add(scoreLabel);
         }

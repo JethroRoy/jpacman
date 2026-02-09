@@ -87,7 +87,7 @@ public abstract class Ghost extends Unit {
      * @return A direction in which the ghost can move, or <code>null</code> if
      * the ghost is shut in by inaccessible squares.
      */
-     protected abstract Direction randomMove();
+    protected abstract Direction randomMove();
 
     /**
      * Determines a possible move in a random direction.

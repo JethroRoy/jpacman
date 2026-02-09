@@ -100,6 +100,7 @@ public class MapParser {
      * @param gridCtx
      *            Character describing the square type.
      */
+    @SuppressWarnings("checkstyle:MethodLength")
     protected void addSquare(GridContext gridCtx, int x, int y) {
         char c = gridCtx.map[x][y];
 
@@ -266,6 +267,7 @@ public class MapParser {
      * @param startPositions
      * @param map
      */
+    @SuppressWarnings("checkstyle:VisibilityModifier")
     public static class GridContext {
         public final Square[][] grid;
         public final List<Ghost> ghosts;
